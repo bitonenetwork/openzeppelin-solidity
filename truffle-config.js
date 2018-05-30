@@ -1,43 +1,32 @@
-require('dotenv').config();
 require('babel-register');
 require('babel-polyfill');
 
-const HDWalletProvider = require('truffle-hdwallet-provider');
+var provider;
+var HDWalletProvider = require('truffle-hdwallet-provider');
+var mnemonic = '[REDACTED]';
 
-const providerWithMnemonic = (mnemonic, rpcEndpoint) =>
-  new HDWalletProvider(mnemonic, rpcEndpoint);
+if (!process.env.SOLIDITY_COVERAGE){
+  provider = new HDWalletProvider(mnemonic, 'https://ropsten.infura.io/')
+}
 
-const infuraProvider = network => providerWithMnemonic(
-  process.env.MNEMONIC || '',
-  `https://${network}.infura.io/${process.env.INFURA_API_KEY}`
-);
-
-const ropstenProvider = process.env.SOLIDITY_COVERAGE
-  ? undefined
-  : infuraProvider('ropsten');
 
 module.exports = {
   networks: {
     development: {
       host: 'localhost',
       port: 8545,
-      network_id: '*', // eslint-disable-line camelcase
+      network_id: '*'
     },
     ropsten: {
-      provider: ropstenProvider,
-      network_id: 3, // eslint-disable-line camelcase
+      provider: provider,
+      network_id: 3 // official id of the ropsten network
     },
     coverage: {
-      host: 'localhost',
-      network_id: '*', // eslint-disable-line camelcase
+      host: "localhost",
+      network_id: "*",
       port: 8555,
       gas: 0xfffffffffff,
-      gasPrice: 0x01,
-    },
-    ganache: {
-      host: 'localhost',
-      port: 8545,
-      network_id: '*', // eslint-disable-line camelcase
-    },
-  },
+      gasPrice: 0x01
+    }
+  }
 };
